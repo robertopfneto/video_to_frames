@@ -1,47 +1,50 @@
-#bibliotecas
 import cv2
 import os
-
-#caminho 
 import caminho_video
 
-caminho_videos = caminho_video.caminho #trocar isso pelo caminho ate os videos
-videos_salvos = caminho_videos.videos_salvos # isso tambem
-each_frames = 10 # "A cada (each_frames) ele salva 1 frames, altera aq esse valor"
+# Caminho principal com as subpastas que contêm os vídeos
+caminho_videos = caminho_video.caminho
+each_frames = 10  # Salva um frame a cada X frames
 
-def processar_video(videos_input, videos_output):
-    os.makedirs(videos_output,exist_ok=True)
+def processar_video(caminho_base):
+    for subpasta in os.listdir(caminho_base):
+        caminho_subpasta = os.path.join(caminho_base, subpasta)
 
-    for video in os.listdir(videos_input):
-        if video.lower().endswith(('mp4','.avi','.mov','.mkv')):
-            caminho_video = os.path.join(videos_input, video)
-            nome = os.path.splitext(video)[0] #pegar so o nome do arquivo
-        
-            cap = cv2.VideoCapture(caminho_video)
+        if not os.path.isdir(caminho_subpasta):
+            continue  # Pula arquivos soltos
 
-            if not cap.isOpened():
-                print(f"Erro ao abrir vídeo: {nome}")
-                continue
+        # Cria subpasta 'frames/' dentro da subpasta atual
+        pasta_saida = os.path.join(caminho_subpasta, "frames")
+        os.makedirs(pasta_saida, exist_ok=True)
 
-            n_frames = 0
-            saved_frames = 0
+        for video in os.listdir(caminho_subpasta):
+            if video.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):
+                caminho_video_completo = os.path.join(caminho_subpasta, video)
+                nome = os.path.splitext(video)[0]
 
-            while True:
-                ret, frame = cap.read() #le o proximo frame
-                if not ret: # ret eh booleano e retorna falso quando nao tem proximo frame
-                    break
+                cap = cv2.VideoCapture(caminho_video_completo)
+                if not cap.isOpened():
+                    print(f"Erro ao abrir vídeo: {caminho_video_completo}")
+                    continue
 
-                if n_frames % each_frames == 0:
-                    image_out = f"{nome}_frame_{saved_frames:04d}.png"
-                    output_path = os.path.join(videos_output, nome)
-                    cv2.imwrite(output_path, frame)
-                    saved_frames += 1
-                
-                n_frames += 1
+                n_frames = 0
+                saved_frames = 0
 
-            cap.release()
-            print(f"Video processado com sucesso, Total de Frames extraidos: {n_frames}")
+                while True:
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
 
+                    if n_frames % each_frames == 0:
+                        nome_frame = f"{nome}_frame_{saved_frames:04d}.png"
+                        caminho_saida_frame = os.path.join(pasta_saida, nome_frame)
+                        cv2.imwrite(caminho_saida_frame, frame)
+                        saved_frames += 1
 
-processar_video(caminho_videos, videos_salvos)
+                    n_frames += 1
 
+                cap.release()
+                print(f"[✓] {video} → {saved_frames} frames salvos em {pasta_saida}")
+
+# Executa
+processar_video(caminho_videos)
