@@ -14,7 +14,7 @@ def processar_video(caminho_base):
             continue  # Pula arquivos soltos
 
         # Cria subpasta 'frames/' dentro da subpasta atual
-        pasta_saida = os.path.join("frames")
+        pasta_saida = os.path.join("frames_{subpasta}")
         os.makedirs(pasta_saida, exist_ok=True)
 
         for video in os.listdir(caminho_subpasta):
