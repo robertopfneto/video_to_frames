@@ -7,7 +7,7 @@ import caminho_video
 
 caminho_videos = caminho_video.caminho #trocar isso pelo caminho ate os videos
 videos_salvos = caminho_videos.videos_salvos # isso tambem
-each_frames = 10
+each_frames = 10 # "A cada (each_frames) ele salva 1 frames, altera aq esse valor"
 
 def processar_video(videos_input, videos_output):
     os.makedirs(videos_output,exist_ok=True)
